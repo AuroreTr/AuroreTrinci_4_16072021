@@ -174,11 +174,18 @@ label {
   display: inline-block;
   margin-bottom: 11px;
 }
+
 input {
   padding: 8px;
   border: 0.8px solid #ccc;
   outline: none;
 }
+
+.verif {
+  margin-top: 50px;
+  color: #e54858;
+}
+
 .text-control {
   margin: 0;
   padding: 8px;
@@ -187,6 +194,7 @@ input {
   font-size: 20px;
   height: 48px;
 }
+
 .formData[data-error]::after {
   content: attr(data-error);
   font-size: 0.4em;
@@ -205,12 +213,12 @@ input {
 .formData[data-error-visible="true"] .text-control {
   border: 2px solid #e54858;
 }
-/* 
+
   input[data-error]::after {
       content: attr(data-error);
       font-size: 0.4em;
       color: red;
-  } */
+  }
 .checkbox-label,
 .checkbox2-label {
   position: relative;
