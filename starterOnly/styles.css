@@ -46,7 +46,7 @@ img {
 .main-navbar {
   display: flex;
   justify-content: space-between;
-  /* float: left; */
+  /* float: right; */
 }
 
 .topnav a {
@@ -145,7 +145,7 @@ img {
   height: 100%;
   width: 100%;
   overflow: auto;
-  background-color: rgba(26, 39, 156, 0.4);
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .content {
@@ -473,6 +473,10 @@ input {
   background-position: center;
 }
 
+#validate-message {
+  display: none;
+}
+
 /* .hero-img img {
   width: 100%;
   height: 100%;
@@ -510,14 +514,16 @@ footer {
 
 @media screen and (max-width: 992px) {
   .topnav {
-    flex-direction: row;
+    display: block;
   }
   .topnav a {
     display: none;
   }
   .topnav a.icon {
-    float: right;
     display: block;
+    position: absolute;
+    right: 35px;
+    top: 35px;
   }
   .topnav.responsive {
     position: relative;
@@ -530,7 +536,10 @@ footer {
   .topnav.responsive a {
     float: none;
     display: block;
-    text-align: left;
+    text-align: right;
+  }
+  .margin-top {
+    margin-top: 40px;
   }
   .main-navbar {
     flex-flow: column wrap;
@@ -576,10 +585,9 @@ footer {
     width: 100%;
     padding-top: 100%;
   }
-  /* .hero-img img {
-    border-radius: 10px;
-    margin-top: 40px;
-  } */
+  .bground {
+    margin-top: 150px;
+  }
   .btn-signup {
     grid-row: 4;
     margin: 50px auto 20px;

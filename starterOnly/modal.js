@@ -10,6 +10,8 @@ function editNav() {
 // DOM Elements
 const modalbg = document.querySelector(".bground");
 const modalBtn = document.querySelectorAll(".modal-btn");
+const modalBody = document.getElementsByClassName('modal-body');
+const validateMessage = document.getElementById("validate-message");
 const reserveForm = document.getElementById("reserveForm");
 const formData = document.querySelectorAll(".formData");
 const firstName = document.getElementById("first-name");
@@ -39,9 +41,13 @@ document.getElementById("close").addEventListener("click", function () {
   modalbg.style.display = "none";
 });
 
-// Check names input
-console.log('namevalidate');
+window.addEventListener('click', function(e) {
+  if (e.target == modalbg) {
+    modalbg.style.display = 'none';
+  }
+})
 
+// Check names input
 function stringLengthOnChange(input, errorMessage) {
   input.onchange = function stringLength() {
     if (input.value.length < 2) {
@@ -66,11 +72,9 @@ function validateEmailOnChange(input, errorMessage) {
 
     if (!regexEmail.test(input.value)) {
       errorMessage.innerHTML = `<p>Veuillez entrer une adresse email valide.</p>`;
-      console.log('email incorrect');
       return false;
     } else if (regexEmail.test(input.value)) {
       errorMessage.innerHTML = '';
-      console.log('email ok');
       return true;
     }
   }
@@ -95,29 +99,26 @@ function validateQuantityOnChange(input, errorMessage) {
 validateQuantityOnChange(quantity, quantityError);
 
 // check location input
-function validateLocation() {
-  if (
-    !document.getElementById('newYorkLocation').checked
-    && !document.getElementById('sanFranciscoLocation').checked
-    && !document.getElementById('seattleLocation').checked
-    && !document.getElementById('chicagoLocation').checked
-    && !document.getElementById('bostonLocation').checked
-    && !document.getElementById('portlandLocation').checked
-  ) {
-    locationError.innerHTML = '<p>Veuillez sélectionner une ville</p>';
-    return false;
-  } else if (
-    document.getElementById('newYorkLocation').checked
-    || document.getElementById('sanFranciscoLocation').checked
-    || document.getElementById('seattleLocation').checked
-    || document.getElementById('chicagoLocation').checked
-    || document.getElementById('bostonLocation').checked
-    || document.getElementById('portlandLocation').checked
-  ) {
-    locationError.innerHTML = '';
-    return true;
+/**
+ * permet de savoir si un bouton radio est coché
+ *
+ * @return  {Boolean}  vrai si un bouton radio est coché sinon faux
+ */
+ function validateLocation(){
+  const list = document.querySelectorAll("input[type='radio']");
+  list.onchange = function locationChecked() {
+    for (let i = 0; i < list.length; i++) {
+      if(list[i].checked) {
+        locationError.innerHTML = '';
+        return true;
+      } else {
+        locationError.innerHTML = 'Veuillez sélectionner une ville';
+        return false;
+      }
+    }  
   }
-}
+} 
+
 
 validateLocation();
 
@@ -134,22 +135,38 @@ function acceptCgvOnChange() {
   } 
 }
 
-reserveForm.addEventListener("submit", function validate(e) {
-  if (
-    !stringLengthOnChange(firstName, firstNameError)
-    || !stringLengthOnChange(lastName, lastNameError)
-    || !validateEmailOnChange(email, emailError)
-    || !validateQuantityOnChange(quantity, quantityError)
-    || !validateLocation()
-  ) {
-    e.preventDefault();
-  } else if (
-    stringLengthOnChange(firstName, firstNameError)
-    && stringLengthOnChange(lastName, lastNameError)
-    && validateEmailOnChange(email, emailError)
-    && validateQuantityOnChange(quantity, quantityError)
-    && validateLocation()
-  ) {
-    console.log('validé');
-  }
-});
+const refDate = Date.now();
+console.log(refDate);
+
+// reserveForm.addEventListener("submit", function validate(e) {
+//   if (stringLengthOnChange(firstName, firstNameError)
+//     || stringLengthOnChange(lastName, lastNameError)
+//     || validateEmailOnChange(email, emailError)
+//     || validateQuantityOnChange(quantity, quantityError)
+//     || validateLocation()
+//     || acceptCgv()
+//   ) {
+//     modalBody.style.display = 'none';
+//     validateMessage.style.display = 'block';  
+//   } else {
+//     e.preventdefault();
+//   }
+// });
+
+function setDateLimit(oldmin, oldmax){
+  const refDate = new Date(Date.now());
+  console.log(refDate);
+  const targetDate = new Date(Date.now());
+  targetDate.setFullYear(refDate.getFullYear()-oldmax)
+  birthDate.min = makeInputLimitText(targetDate);
+  birthDate.max = makeInputLimitText(targetDate.setFullYear(refDate.getFullYear()-oldmin));
+
+}
+
+function makeInputLimitText(targetDate){
+  console.log( targetDate)
+  let {year, month, date} = targetDate;
+  if (month <10) month = "0"+month;
+  if (date <10) date = "0"+date;
+  return `${year}-${month}-${date}`;
+}
