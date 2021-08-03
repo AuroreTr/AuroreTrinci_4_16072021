@@ -65,8 +65,8 @@
             id="reserveForm"
             action="index.html"
             method="get"
+            onsubmit="return validate();"
           >
-          <!-- onsubmit="return validate();" -->
 
             <div class="formData">
               <label for="first-name">Prénom</label><br />
@@ -220,11 +220,6 @@
               value="C'est parti"
             />
           </form>
-        </div>
-        <div id="validate-message">
-          <p class="validate-message">
-            Nous vous remercions pour votre participation !
-          </p>
         </div>
       </div>
     </div>

@@ -28,6 +28,23 @@ const locationError = document.getElementById('location-error');
 const checkCgv = document.getElementById('checkCgv');
 const checkCgvError = document.getElementById('checkCgv-error');
 
+birthDate.min = getDateLimit(100);
+birthDate.max = getDateLimit(18);
+
+function dateValidateOnChange() {
+  birthDate.onchange = function dateValidate() {
+    if (!birthDate.checkValidity()) {
+      birthDateError.innerHTML = `Veuillez entrez une date de naissance valide`;
+      return false;
+    } else {
+      birthDateError.innerHTML = '';
+      return true;
+    }  
+  }
+}
+
+dateValidateOnChange();
+
 // launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
 
@@ -98,6 +115,7 @@ function validateQuantityOnChange(input, errorMessage) {
 
 validateQuantityOnChange(quantity, quantityError);
 
+
 // check location input
 /**
  * permet de savoir si un bouton radio est coché
@@ -105,6 +123,7 @@ validateQuantityOnChange(quantity, quantityError);
  * @return  {Boolean}  vrai si un bouton radio est coché sinon faux
  */
  function validateLocation(){
+ 
   const list = document.querySelectorAll("input[type='radio']");
   list.onchange = function locationChecked() {
     for (let i = 0; i < list.length; i++) {
@@ -123,50 +142,45 @@ validateQuantityOnChange(quantity, quantityError);
 validateLocation();
 
 // check CGV
-function acceptCgvOnChange() {
-  checkCgv.onchange = function acceptCgv() {
-    if (!checkCgv.checked) {
-      checkCgvError.innerHTML = '<p>Vous devez accepter les conditions générales</p>';
-      return false;
-    } else if (checkCgv.checked) {
-      checkCgvError.innerHTML = '';
-      return true;
-    }
-  } 
-}
+function acceptCgv() {
+  if (!checkCgv.checked) {
+    checkCgvError.innerHTML = '<p>Vous devez accepter les conditions générales</p>';
+    return false;
+  } else if (checkCgv.checked) {
+    checkCgvError.innerHTML = '';
+    return true;
+  }
+} 
 
-const refDate = Date.now();
-console.log(refDate);
 
-// reserveForm.addEventListener("submit", function validate(e) {
-//   if (stringLengthOnChange(firstName, firstNameError)
-//     || stringLengthOnChange(lastName, lastNameError)
-//     || validateEmailOnChange(email, emailError)
-//     || validateQuantityOnChange(quantity, quantityError)
-//     || validateLocation()
-//     || acceptCgv()
-//   ) {
-//     modalBody.style.display = 'none';
-//     validateMessage.style.display = 'block';  
-//   } else {
-//     e.preventdefault();
-//   }
-// });
+acceptCgv();
 
-function setDateLimit(oldmin, oldmax){
-  const refDate = new Date(Date.now());
-  console.log(refDate);
+
+
+reserveForm.addEventListener("submit", function validate(e) {
+  console.log('validate');
+  e.preventdefault();
+  e.stopPropagation();
+  if (stringLengthOnChange(firstName, firstNameError)
+    || stringLengthOnChange(lastName, lastNameError)
+    || validateEmailOnChange(email, emailError)
+    || validateQuantityOnChange(quantity, quantityError)
+    || validateLocation()
+    || acceptCgv()
+    || dateValidateOnChange()
+  ) {
+    modalBody.innerHTML = `<p>Nous vous remercions pour votre participation !</p>`;
+    return true;
+  } else {
+    return false;
+  }
+});
+
+function getDateLimit(gap){
   const targetDate = new Date(Date.now());
-  targetDate.setFullYear(refDate.getFullYear()-oldmax)
-  birthDate.min = makeInputLimitText(targetDate);
-  birthDate.max = makeInputLimitText(targetDate.setFullYear(refDate.getFullYear()-oldmin));
+  targetDate.setFullYear(targetDate.getFullYear()-gap);
+  const day = targetDate.getDate();
+  const month = targetDate.getMonth();
 
-}
-
-function makeInputLimitText(targetDate){
-  console.log( targetDate)
-  let {year, month, date} = targetDate;
-  if (month <10) month = "0"+month;
-  if (date <10) date = "0"+date;
-  return `${year}-${month}-${date}`;
+  return `${targetDate.getFullYear()}-${month >9 ? month : "0"+month}-${day >9 ? day : "0"+day}`;
 }
