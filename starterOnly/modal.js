@@ -39,7 +39,7 @@ function dateValidateOnChange() {
     } else {
       birthDateError.innerHTML = '';
       return true;
-    }  
+    }
   }
 }
 
@@ -58,63 +58,59 @@ document.getElementById("close").addEventListener("click", function () {
   modalbg.style.display = "none";
 });
 
-window.addEventListener('click', function(e) {
+window.addEventListener('click', function (e) {
   if (e.target == modalbg) {
     modalbg.style.display = 'none';
   }
 })
 
-// Check names input
-function stringLengthOnChange(input, errorMessage) {
-  input.onchange = function stringLength() {
-    if (input.value.length < 2) {
-      errorMessage.innerHTML = '<p>Veuillez entrer 2 caractères ou plus pour le champ du nom<p/>';
-      // console.log('min 2');
-      return false;
-    } else {
-      errorMessage.innerHTML = '';
-      // console.log('nb of characters ok');
-      return true;
-    }
-  }  
+// validate string length for the first name and the last name
+function validStringLength(input, errorMessage) {
+  // console.log("...",input, input.id, errorMessage)
+  if (input.value.length < 2) {
+    errorMessage.innerHTML = '<p>Veuillez entrer 2 caractères ou plus pour le champ du nom<p/>';
+    // console.log('min 2');
+    return false;
+  }
+  errorMessage.innerHTML = '';
+  // console.log('nb of characters ok');
+  return true;
 }
 
-stringLengthOnChange(firstName, firstNameError);
-stringLengthOnChange(lastName, lastNameError);
+// validate email
+function validEmail(input, errorMessage) {
 
-// check email address input
-function validateEmailOnChange(input, errorMessage) {
-  input.onchange = function validateEmail() {
-    const regexEmail = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+  const regexEmail = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
-    if (!regexEmail.test(input.value)) {
-      errorMessage.innerHTML = `<p>Veuillez entrer une adresse email valide.</p>`;
-      return false;
-    } else if (regexEmail.test(input.value)) {
-      errorMessage.innerHTML = '';
-      return true;
-    }
+  if (!regexEmail.test(input.value) || input.value.length < 1) {
+    errorMessage.innerHTML = `<p>Veuillez entrer une adresse email valide.</p>`;
+    return false;
+  } 
+  errorMessage.innerHTML = '';
+  return true;
+}
+
+// validate  birthdate
+function getDateLimit(gap) {
+  const targetDate = new Date(Date.now());
+  targetDate.setFullYear(targetDate.getFullYear() - gap);
+  const day = targetDate.getDate();
+  const month = targetDate.getMonth();
+
+  return `${targetDate.getFullYear()}-${month > 9 ? month : "0" + month}-${day > 9 ? day : "0" + day}`;
+}
+
+// validate the number of participations in tournaments
+function validateQuantity(input, errorMessage) {
+  if (isNaN(input.value) || input.value < 0
+    || input.value > 999 || input.value.length < 1) {
+    errorMessage.innerHTML = '<p>Veuillez entrer un nombre compris entre 0 et 999</p>';
+    return false;
+  } else if (!isNaN(input.value) || input.value >= 0 || input.value <= 999) {
+    errorMessage.innerHTML = '';
+    return true;
   }
 }
-
-validateEmailOnChange(email, emailError);
-
-
-// check quantity is a number
-function validateQuantityOnChange(input, errorMessage) {
-  input.onchange = function validateQuantity() {
-    if (isNaN(input.value) || input.value < 0 || input.value > 999) {
-      errorMessage.innerHTML = '<p>Veuillez entrer un nombre compris entre 0 et 999</p>';
-      return false;
-    } else if (!isNaN(input.value) || input.value >= 0 || input.value <= 999) {
-      errorMessage.innerHTML = '';
-      return true;
-    }
-  }
-}
-
-validateQuantityOnChange(quantity, quantityError);
-
 
 // check location input
 /**
@@ -122,65 +118,128 @@ validateQuantityOnChange(quantity, quantityError);
  *
  * @return  {Boolean}  vrai si un bouton radio est coché sinon faux
  */
- function validateLocation(){
- 
+function locationChecked() {
   const list = document.querySelectorAll("input[type='radio']");
-  list.onchange = function locationChecked() {
-    for (let i = 0; i < list.length; i++) {
-      if(list[i].checked) {
-        locationError.innerHTML = '';
-        return true;
-      } else {
-        locationError.innerHTML = 'Veuillez sélectionner une ville';
-        return false;
-      }
-    }  
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].checked) {
+      locationError.innerHTML = '';
+      return true;
+    } else {
+      locationError.innerHTML = 'Veuillez sélectionner une ville';
+      return false;
+    }
   }
-} 
+}
 
-
-validateLocation();
-
-// check CGV
 function acceptCgv() {
   if (!checkCgv.checked) {
     checkCgvError.innerHTML = '<p>Vous devez accepter les conditions générales</p>';
     return false;
-  } else if (checkCgv.checked) {
-    checkCgvError.innerHTML = '';
-    return true;
   }
-} 
+  checkCgvError.innerHTML = '';
+  return true;
+}
 
+const inputList = document.querySelectorAll("input");
+inputList.forEach(element => {
+  const domError = document.getElementById(element.id + "-error");
+  switch (element.type) {
+    case "text":
+      element.addEventListener("input", () => { validStringLength(element, domError) });
+      break;
+    case "email":
+      element.addEventListener("input", () => { validEmail(element, domError) });
+      break;
 
-acceptCgv();
-
-
-
-reserveForm.addEventListener("submit", function validate(e) {
-  console.log('validate');
-  e.preventdefault();
-  e.stopPropagation();
-  if (stringLengthOnChange(firstName, firstNameError)
-    || stringLengthOnChange(lastName, lastNameError)
-    || validateEmailOnChange(email, emailError)
-    || validateQuantityOnChange(quantity, quantityError)
-    || validateLocation()
-    || acceptCgv()
-    || dateValidateOnChange()
-  ) {
-    modalBody.innerHTML = `<p>Nous vous remercions pour votre participation !</p>`;
-    return true;
-  } else {
-    return false;
+    // case "date":
+    //   element.addEventListener('input', () => ()
+    case'number':
+      element.addEventListener('input', () => { validateQuantity(element, domError) });
+      break;
+    case 'radio':
+      element.addEventListener('input', () => { locationChecked() });
+      break;
+    case 'checkbox':
+      element.addEventListener('input', () => { acceptCgv() });
+      break;
   }
 });
 
-function getDateLimit(gap){
-  const targetDate = new Date(Date.now());
-  targetDate.setFullYear(targetDate.getFullYear()-gap);
-  const day = targetDate.getDate();
-  const month = targetDate.getMonth();
 
-  return `${targetDate.getFullYear()}-${month >9 ? month : "0"+month}-${day >9 ? day : "0"+day}`;
+
+
+// check CGV
+function acceptCgvOnChange() {
+  checkCgv.onchange = function acceptCgv() {
+    if (!checkCgv.checked) {
+      checkCgvError.innerHTML = '<p>Vous devez accepter les conditions générales</p>';
+      return false;
+    } else if (checkCgv.checked) {
+      checkCgvError.innerHTML = '';
+      return true;
+    }
+  }
 }
+
+acceptCgvOnChange();
+
+
+document.getElementById('btn-submit').addEventListener('click', function (e) {
+  // console.log('check2');
+  e.preventDefault();
+  let domError;
+  let erreurs = 0;
+  inputList.forEach(element => {
+    domError = document.getElementById(element.id + "-error");
+    switch (element.type) {
+      case "text":
+        if (!validStringLength(element, domError)) erreurs++;
+        break;
+      case "email":
+        if (!validEmail(element, domError)) erreurs++;
+        break;
+      case "number":
+        if (!validateQuantity(element, domError)) erreurs++;
+        break;
+      case "radio":
+        if (!locationChecked()) erreurs++;
+        break;
+    }
+  });
+  if (erreurs === 0
+    // if (stringLengthOnChange(firstName, firstNameError)
+    // || stringLengthOnChange(lastName, lastNameError)
+    // || validateEmailOnChange(email, emailError)
+    // || validateQuantityOnChange(quantity, quantityError)
+    // || validateLocation()
+    // || acceptCgvOnChange()
+    // || dateValidateOnChange()
+  ) {
+    modalBody.innerHTML = `<p>Nous vous remercions pour votre participation !</p>`;
+    return true;
+  } 
+    // console.log(stringLengthOnChange(firstName, firstNameError));
+
+    // console.log('false');
+    return false;
+  
+});
+
+// reserveForm.addEventListener("submit", function validate(e) {
+//   console.log('check');
+//   e.preventdefault();
+//   // e.stopPropagation();
+//   if (stringLengthOnChange(firstName, firstNameError)
+//     || stringLengthOnChange(lastName, lastNameError)
+//     || validateEmailOnChange(email, emailError)
+//     || validateQuantityOnChange(quantity, quantityError)
+//     || validateLocation()
+//     || acceptCgvOnChange()
+//     || dateValidateOnChange()
+//   ) {
+//     modalBody.innerHTML = `<p>Nous vous remercions pour votre participation !</p>`;
+//     return true;
+//   } else {
+//     return false;
+//   }
+// });
