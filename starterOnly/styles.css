@@ -511,10 +511,20 @@ footer {
   .topnav a.icon {
     float: right;
     display: block;
-    margin-top: -15px;
+    margin-top: -30px;
   }
   .bground {
     height: 80vh;
+  }
+  .header-logo {
+    width: 160px;
+  }
+  .header-logo img {
+    width: 150px;
+    height: 25px;
+  }
+  .hero-headline {
+    font-size: 1.5rem;
   }
 }
 
@@ -577,7 +587,7 @@ footer {
   .hero-headline {
     grid-row: 1;
     margin-bottom: 70px;
-    font-size: 4.5rem;
+    font-size: 3.5rem;
     white-space: normal;
   }
   .hero-text {
