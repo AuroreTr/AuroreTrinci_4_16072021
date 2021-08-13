@@ -10,40 +10,14 @@ function editNav() {
 // DOM Elements
 const modalbg = document.querySelector(".bground");
 const modalBtn = document.querySelectorAll(".modal-btn");
-const modalBody = document.getElementsByClassName('modal-body');
+const modalBody = document.getElementById('modal-body');
 const validateMessage = document.getElementById("validate-message");
 const reserveForm = document.getElementById("reserveForm");
-const formData = document.querySelectorAll(".formData");
-const firstName = document.getElementById("first-name");
-const firstNameError = document.getElementById("first-name-error");
-const lastName = document.getElementById('last-name');
-const lastNameError = document.getElementById('last-name-error');
-const email = document.getElementById('email');
-const emailError = document.getElementById('email-error');
 const birthDate = document.getElementById('birthdate');
 const birthDateError = document.getElementById('birthdate-error');
-const quantity = document.getElementById('quantity');
-const quantityError = document.getElementById('quantity-error');
 const locationError = document.getElementById('location-error');
 const checkCgv = document.getElementById('checkCgv');
 const checkCgvError = document.getElementById('checkCgv-error');
-
-birthDate.min = getDateLimit(100);
-birthDate.max = getDateLimit(18);
-
-function dateValidateOnChange() {
-  birthDate.onchange = function dateValidate() {
-    if (!birthDate.checkValidity()) {
-      birthDateError.innerHTML = `Veuillez entrez une date de naissance valide`;
-      return false;
-    } else {
-      birthDateError.innerHTML = '';
-      return true;
-    }
-  }
-}
-
-dateValidateOnChange();
 
 // launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
@@ -90,15 +64,17 @@ function validEmail(input, errorMessage) {
   return true;
 }
 
-// validate  birthdate
-function getDateLimit(gap) {
-  const targetDate = new Date(Date.now());
-  targetDate.setFullYear(targetDate.getFullYear() - gap);
-  const day = targetDate.getDate();
-  const month = targetDate.getMonth();
-
-  return `${targetDate.getFullYear()}-${month > 9 ? month : "0" + month}-${day > 9 ? day : "0" + day}`;
+// validate birth date
+console.log(birthDate.value);
+function validateBirthDate() {
+  if (birthDate.value.length === 10) {
+    birthDateError.innerHTML = '';
+    return true;
+  }
+  birthDateError.innerHTML = '<p>Veuillez entrer une date de naissance valide</p>';
+  return false;
 }
+
 
 // validate the number of participations in tournaments
 function validateQuantity(input, errorMessage) {
@@ -113,24 +89,23 @@ function validateQuantity(input, errorMessage) {
 }
 
 // check location input
-/**
- * permet de savoir si un bouton radio est coché
- *
- * @return  {Boolean}  vrai si un bouton radio est coché sinon faux
- */
-function locationChecked() {
-  const list = document.querySelectorAll("input[type='radio']");
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].checked) {
-      locationError.innerHTML = '';
-      return true;
-    } else {
-      locationError.innerHTML = 'Veuillez sélectionner une ville';
-      return false;
-    }
+function validateLocation() {
+  if (
+    document.getElementById('newYorkLocation').checked
+    || document.getElementById('sanFranciscoLocation').checked
+    || document.getElementById('seattleLocation').checked
+    || document.getElementById('chicagoLocation').checked
+    || document.getElementById('bostonLocation').checked
+    || document.getElementById('portlandLocation').checked
+  ) {
+    locationError.innerHTML = '';
+    return true;
   }
+  locationError.innerHTML = '<p>Veuillez sélectionner une ville</p>';
+  return false;
 }
 
+// check CGV
 function acceptCgv() {
   if (!checkCgv.checked) {
     checkCgvError.innerHTML = '<p>Vous devez accepter les conditions générales</p>';
@@ -150,39 +125,20 @@ inputList.forEach(element => {
     case "email":
       element.addEventListener("input", () => { validEmail(element, domError) });
       break;
-
-    // case "date":
-    //   element.addEventListener('input', () => ()
+    case "date":
+      element.addEventListener('input', () => { validateBirthDate(element, domError) });
+      break;
     case'number':
       element.addEventListener('input', () => { validateQuantity(element, domError) });
       break;
     case 'radio':
-      element.addEventListener('input', () => { locationChecked() });
+      element.addEventListener('input', () => { validateLocation(element, domError) });
       break;
     case 'checkbox':
-      element.addEventListener('input', () => { acceptCgv() });
+      element.addEventListener('input', () => { acceptCgv(element, domError) });
       break;
   }
 });
-
-
-
-
-// check CGV
-function acceptCgvOnChange() {
-  checkCgv.onchange = function acceptCgv() {
-    if (!checkCgv.checked) {
-      checkCgvError.innerHTML = '<p>Vous devez accepter les conditions générales</p>';
-      return false;
-    } else if (checkCgv.checked) {
-      checkCgvError.innerHTML = '';
-      return true;
-    }
-  }
-}
-
-acceptCgvOnChange();
-
 
 document.getElementById('btn-submit').addEventListener('click', function (e) {
   // console.log('check2');
@@ -198,48 +154,45 @@ document.getElementById('btn-submit').addEventListener('click', function (e) {
       case "email":
         if (!validEmail(element, domError)) erreurs++;
         break;
+      case "date":
+        if(!validateBirthDate(element,  domError)) erreurs++;
+        break;
       case "number":
         if (!validateQuantity(element, domError)) erreurs++;
         break;
       case "radio":
-        if (!locationChecked()) erreurs++;
+        if (!validateLocation(element,domError)) erreurs++;
+        break;
+      case 'checkbox':
+        if (!acceptCgv(element, domError)) erreurs++;
         break;
     }
   });
-  if (erreurs === 0
-    // if (stringLengthOnChange(firstName, firstNameError)
-    // || stringLengthOnChange(lastName, lastNameError)
-    // || validateEmailOnChange(email, emailError)
-    // || validateQuantityOnChange(quantity, quantityError)
-    // || validateLocation()
-    // || acceptCgvOnChange()
-    // || dateValidateOnChange()
-  ) {
-    modalBody.innerHTML = `<p>Nous vous remercions pour votre participation !</p>`;
+  // console.log(birthDate.value);
+  // console.log(birthDate.value.length);
+  // console.log(erreurs);
+  if (erreurs === 0) {
+    modalBody.innerHTML = `<p></p><p id='validation-message'>Nous vous remercions pour votre participation !</p><input id='close2' class='close2' value='Fermer'>`;
+    const closeValidateModal = document.getElementById('close2');
+    const validationMessage = document.getElementById('validation-message');
+    modalBody.style.height = '80vh';
+    modalBody.style.display = 'flex';
+    modalBody.style.flexDirection = 'column';
+    modalBody.style.justifyContent = 'space-between';
+    modalBody.style.alignItems = 'center';
+    validationMessage.style.fontSize = '2rem';
+    validationMessage.style.textAlign = 'center';
+    validationMessage.style.width = '75%';
+    closeValidateModal.style.textAlign = 'center';
+    closeValidateModal.style.width = '180px';
+    closeValidateModal.style.padding = '12px 0';
+
+    //close modal form after submit 
+    closeValidateModal.addEventListener("click", function () {
+      modalbg.style.display = "none";
+    });
+
     return true;
-  } 
-    // console.log(stringLengthOnChange(firstName, firstNameError));
-
-    // console.log('false');
-    return false;
-  
+  }
+  return false;
 });
-
-// reserveForm.addEventListener("submit", function validate(e) {
-//   console.log('check');
-//   e.preventdefault();
-//   // e.stopPropagation();
-//   if (stringLengthOnChange(firstName, firstNameError)
-//     || stringLengthOnChange(lastName, lastNameError)
-//     || validateEmailOnChange(email, emailError)
-//     || validateQuantityOnChange(quantity, quantityError)
-//     || validateLocation()
-//     || acceptCgvOnChange()
-//     || dateValidateOnChange()
-//   ) {
-//     modalBody.innerHTML = `<p>Nous vous remercions pour votre participation !</p>`;
-//     return true;
-//   } else {
-//     return false;
-//   }
-// });
